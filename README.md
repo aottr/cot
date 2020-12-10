@@ -15,3 +15,4 @@
 ## Ideen
 - Corona Luftfeuchtigkeitstracker mit Ampelsystem und Dashboard für Pandemie-Verantwortlichen 
 - https://www.tagesschau.de/inland/corona-luftfeuchtigkeit-101.html
+- Pflanzen Feuchtigkeitsmesser für Predicitive Gießen
