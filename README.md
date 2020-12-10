@@ -12,3 +12,6 @@
 - Ertragsmodell: Wie verdient der Anbieter damit Geld (bzw. plant Geld zu verdienen)? (vgl. Ertragsmodellmuster nach Wortmann et al.)
 ### Technische Architektur
 - Beschreiben Sie aufbauend auf den Erfahrungen der genutzten Demo Boards die technische Architektur der Lösung an einzelnen Beispielen
+## Ideen
+- Corona Luftfeuchtigkeitstracker mit Ampelsystem und Dashboard für Pandemie-Verantwortlichen 
+- https://www.tagesschau.de/inland/corona-luftfeuchtigkeit-101.html
