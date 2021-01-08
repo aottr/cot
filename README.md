@@ -13,6 +13,7 @@
 ### Technische Architektur
 - Beschreiben Sie aufbauend auf den Erfahrungen der genutzten Demo Boards die technische Architektur der Lösung an einzelnen Beispielen
 ## Ideen
-### Pflanzen Feuchtigkeitsmesser für Predicitive Gießen
-### Corona Luftfeuchtigkeitstracker mit Ampelsystem und Dashboard für Pandemie-Verantwortlichen
+- Corona Luftfeuchtigkeitstracker mit Ampelsystem und Dashboard für Pandemie-Verantwortlichen
 - https://healthcare-in-europe.com/de/news/welche-rolle-spielt-luftfeuchtigkeit-bei-der-verbreitung-von-sars-cov-2.html
+- Grundsätzlich: 
+-
