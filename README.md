@@ -10,6 +10,8 @@
 #### Wertangebot: Welche Mehrwerte bietet die Lösung? Welche Komponenten umfasst diese technisch? (vgl. Value Proposition Canvas)
 #### Wertschöpfungsarchitektur: Welche Komponenten werden von welchen Akteuren bereit gestellt? (vgl. 5 Ebenen Modell der IoT nach Fleisch et al.)
 #### Ertragsmodell: Wie verdient der Anbieter damit Geld (bzw. plant Geld zu verdienen)? (vgl. Ertragsmodellmuster nach Wortmann et al.)
+- Free for academic use (Forschungsinstitutionen müssen nur die Geräte erwerben zum Einkaufspreis, es muss keine monatliche Zahlung für die Service-Erbringung gezahlt werden)
+- Für alle anderen setzen sich die Kosten aus einmaligen Kosten für Geräte und Installation und laufenden Kosten in Form einer Service Pauschale für Betrieb und Wartung für die Messaging und Cloud-Plattform zusammen
 ### Technische Architektur
 - Beschreiben Sie aufbauend auf den Erfahrungen der genutzten Demo Boards die technische Architektur der Lösung an einzelnen Beispielen
 ## Ideen
