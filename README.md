@@ -23,7 +23,8 @@
 -wenn die Raum-Luftfeuchtigkeit zu niedrig ist, und die Außen-Lufttemperatur nicht ausreicht, wird die Lüftung mit einem Lüftfeuchter angestoßen und aktuelle Werte auf dem Display ausgegeben
 -alle Räume und deren Zustand wird in einem Dashboard für den Pandemie-Verantwortlichen sichtbar gemacht
 ## Verkabelung
-- Temperatur/Luftfeuchtigkeitssensor
+- Temperatur/Luftfeuchtigkeitssensor (I2C, DATA GPIO21, CLK GPIO23)
 - LCD Panel (Speaker)
+- 2 Relais (GPIO13, GPIO12)
 
 
