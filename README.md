@@ -18,9 +18,9 @@
 - Corona Luftfeuchtigkeitstracker mit Ampelsystem und Dashboard für Pandemie-Verantwortlichen
 - https://healthcare-in-europe.com/de/news/welche-rolle-spielt-luftfeuchtigkeit-bei-der-verbreitung-von-sars-cov-2.html
 - Grundsätzlich: Liegt die relative Luftfeuchtigkeit der Raumluft unter 40 Prozent, dann nehmen die von Infizierten ausgestoßenen Partikel weniger Wasser auf, bleiben leichter, fliegen weiter durch den Raum und werden eher von Gesunden eingeatmet. Durch eine geringere Luftfeuchtigkeit sind auch die Schleimhäute empfänglicher für Aufnahme von Virus-Aerosolen. Durch Lüftung kann die Raum-Luftfeuchtigkeit durch die durchschnittliche Außen-Luftfeuchtigkeit von 70-90% in Deutschland erhöht werden.
--Luftfeuchtigkeit soll per MQTT zentral gemeldet werden, dort werden die Werte mit Außen-Luftfeuchtigkeiten abgeglichen
--wenn die Luftfeuchtigkeit außen hoch genug ist und die Raum-Luftfeuchtigkeit zu niedrig, wird eine Lüftung vorgeschlagen und aktuelle Werte auf dem Display ausgegeben
--wenn die Raum-Luftfeuchtigkeit zu niedrig ist, und die Außen-Lufttemperatur nicht ausreicht, wird die Lüftung mit einem Lüftfeuchter angestoßen und aktuelle Werte auf dem Display ausgegeben
+- Luftfeuchtigkeit soll per MQTT zentral gemeldet werden, dort werden die Werte mit Außen-Luftfeuchtigkeiten abgeglichen
+- wenn die Luftfeuchtigkeit außen hoch genug ist und die Raum-Luftfeuchtigkeit zu niedrig, wird eine Lüftung vorgeschlagen und aktuelle Werte auf dem Display ausgegeben
+- wenn die Raum-Luftfeuchtigkeit zu niedrig ist, und die Außen-Lufttemperatur nicht ausreicht, wird die Lüftung mit einem Lüftfeuchter angestoßen und aktuelle Werte auf dem Display ausgegeben
 -alle Räume und deren Zustand wird in einem Dashboard für den Pandemie-Verantwortlichen sichtbar gemacht
 ## Verkabelung
 - Temperatur/Luftfeuchtigkeitssensor (I2C, DATA GPIO21, CLK GPIO23)
