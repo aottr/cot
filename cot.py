@@ -13,16 +13,16 @@ p12.off()
 p13 = Pin(13, Pin.OUT)
 p13.off()
 
-mqtt = M5mqtt('room-1', 'mqtt.dit.htwk-leipzig.de', 1883, 'mqtt', '12345', 300)
+mqtt = M5mqtt('room-1', 'mqtt.dit.htwk-leipzig.de', 1883, 'lab', 'fdit', 300)
 mqtt.start()
-topic = str('group-3/room-1')
+topic = str('lab/03/room-1')
 
 lcd.font(lcd.FONT_DejaVu40)
 
-outsideHumidity = 0.0
 humidity = 0.0
-windows = str('closed')
-humidifier = str('off')
+stateOut1 = False
+stateOut2 = False
+ventilationNeeded = False
 
 def readHumidity():
 	buf = bytearray(5)
@@ -30,9 +30,6 @@ def readHumidity():
 	if (buf[0] + buf[1] + buf[2] + buf[3]) & 0xff != buf[4]:
 		raise Exception("checksum error")
 	humidity = buf[0] + buf[1] * 0.1
-
-def getOutsideHumidity():
-	outsideHumidity = 80.0
 
 def showDisplay():
 	lcd.clear()
@@ -44,64 +41,67 @@ def showDisplay():
 		lcd.rect(0, 0, 320, 60, color=colorGreen)
 	else:
 		lcd.rect(0, 0, 320, 60, color=colorRed)
-	lcd.print('Humidity: {}%'.format(humidity), 0, 0, 0xffffff)
+	lcd.print('humidity: {}%'.format(humidity), 0, 0, 0xffffff)
 
-	if (outsideHumidity >= 50.0):
-		lcd.rect(0, 60, 320, 60, color=colorGreen)
-	else:
+	if (ventilationNeeded == True):
 		lcd.rect(0, 60, 320, 60, color=colorRed)
-	lcd.print('Outside Humidity: {}%'.format(outsideHumidity), 0, 60, 0xffffff)
+		lcd.print('ventilation needed', 0, 60, 0xffffff)
+	else:
+		lcd.rect(0, 60, 320, 60, color=colorGreen)
+		lcd.print('no ventilation needed', 0, 60, 0xffffff)
 
-	if (windows == "open"):
+	if (stateOut1 == True):
 		lcd.rect(0, 120, 320, 60, color=colorGreen)
+		lcd.print('output1 state: on'.format(stateOut1), 0, 120, 0xffffff)
 	else:
 		lcd.rect(0, 120, 320, 60, color=colorRed)
-	lcd.print('Windows State: {}'.format(windows), 0, 120, 0xffffff)
+		lcd.print('output1 state: off'.format(stateOut1), 0, 120, 0xffffff)
 
-	if (humidifier == "on"):
+	if (stateOut2 == True):
 		lcd.rect(0, 180, 320, 60, color=colorGreen)
+		lcd.print('output2 state: on'.format(stateOut2), 0, 180, 0xffffff)
 	else:
 		lcd.rect(0, 180, 320, 60, color=colorRed)
-	lcd.print('Humidifier State: {}'.format(humidifier), 0, 180, 0xffffff)
-
+		lcd.print('output2 state: off'.format(stateOut2), 0, 180, 0xffffff)
 
 def sendMQTT():
-	message = str('\{"humidity":"{}","outsideHumidity":"{}","windows":"{}","humidifier":"{}"\}'.format(str(humidity), str(outsideHumidity), windows, humidifier))
+	message = str('\{"humidity":"{}","ventilationNeeded":"{}","stateOut1":"{}","stateOut2":"{}"\}'.format(str(humidity), str(ventilationNeeded), str(stateOut1), str(stateOut2)))
 	mqtt.publish(topic, message)
 
-def openWindows():
+def onOut1():
 	p12.on()
-	windows = str('open')
+	stateOut1 = True
 	
-def closeWindows():
+def offOut1():
 	p12.off()
-	windows = str('closed')
+	stateOut1 = False
 
-def startHumidifier():
+def onOut2():
 	p13.on()
-	humidifier = str('on')
+	stateOut2 = True
 
-def stopHumidifier():
+def offOut2():
 	p13.off()
-	humidifier = str('off')
+	stateOut2 = False
 
 while True:
 	readHumidity()
-	getOutsideHumidity()
 
-	if (humidity <= 40.0):
-		if (outsideHumidity >= 50.0 && windows == "closed"):
-			openWindows()
+	if (humidity < 40.0):
+		if (ventilationNeeded == False && stateOut1 == False && stateOut2 == False):
+			ventilationNeeded = True
+			onOut1()
+			onOut2()
 			showDisplay()
 			sendMQTT()
-		elif (outsideHumidity < 50.0 && humidifier == "off"):
-			startHumidifier()
+		else:
 			showDisplay()
 			sendMQTT()
-	elif (humidity >= 50.0):
-		if (windows == "open" || humidifier == "on"):
-			closeWindows()
-			stopHumidifier()
+	elif (humidity > 60.0):
+		if (ventilationNeeded == True && stateOut1 == True && stateOut2 == True):
+			ventilationNeeded == False
+			offOut1()
+			offOut2()
 			showDisplay()
 			sendMQTT()
 		else:
