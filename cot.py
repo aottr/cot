@@ -6,7 +6,6 @@ from m5mqtt import M5mqtt
 import time
 
 i2c = I2C(0, scl=Pin(23), sda=Pin(21), freq=400000)
-i2c.scan()
 
 p12 = Pin(12, Pin.OUT)
 p12.off()
@@ -26,7 +25,7 @@ ventilationNeeded = False
 
 def readHumidity():
 	buf = bytearray(5)
-	i2c.readfrom_into(0x5c, buf)
+	i2c.readfrom_into(0x5c, buf, stop=True,/)
 	if (buf[0] + buf[1] + buf[2] + buf[3]) & 0xff != buf[4]:
 		raise Exception("checksum error")
 	humidity = buf[0] + buf[1] * 0.1
