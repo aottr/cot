@@ -90,7 +90,7 @@ def showDisplay(humidity):
 		lcd.print('output2 state: off', 0, 180, 0xffffff)
 
 def sendMQTT(humidity):
-	topic = str('lab/03/{}'.format(ROOM_ID)
+	topic = str('lab/03/{}'.format(ROOM_ID))
 	message = str('\{"humidity":"{}","ventilationNeeded":"{}","stateOut1":"{}","stateOut2":"{}"\}'.format(str(humidity), str(ventilationNeeded), str(stateOut1), str(stateOut2)))
 	mqtt.publish(topic, message)
 
