@@ -122,7 +122,7 @@ while True:
 	# very good -> turn off vents
 	elif (humidity > 60.0):
 		if (ventilationNeeded == True && stateOut1 == True && stateOut2 == True):
-			ventilationNeeded == False
+			ventilationNeeded = False
 			offOut1()
 			offOut2()
 	# either way, print value and send status
