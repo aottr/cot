@@ -41,6 +41,12 @@ lcd.setBrightness(10)
 GOOD_HUMIDITY = 40.0
 ROOM_ID = "room-1"
 
+CHECK_INTERVAL = 300000
+# 30min ventilation check
+VENTILATION_RATE = 6
+ventilationCounter = 0
+
+
 #relais outputs
 stateOut1 = False
 stateOut2 = False
@@ -124,6 +130,8 @@ while True:
 			ventilationNeeded = True
 			onOut1()
 			onOut2()
+			# reset counter bc windows open
+			ventilationCounter = 0
 	# very good -> turn off vents
 	elif (humidity > 60.0):
 		if (ventilationNeeded == True and stateOut1 == True and stateOut2 == True):
@@ -134,4 +142,12 @@ while True:
 	showDisplay(humidity)
 	sendMQTT(humidity)
 
-	wait_ms(300000)
+	if (ventilationCounter < VENTILATION_RATE):
+		ventilationCounter += 1
+	else:
+		# ventilate and reset
+		onOut1()
+		onOut2()
+		ventilationCounter = 0
+
+	wait_ms(CHECK_INTERVAL)
