@@ -53,14 +53,10 @@ stateOut2 = False
 ventilationNeeded = False
 
 def readHumidity():
-	# data is 4 bites
-	buf = bytearray(5)
-	i2c.readfrom_into(0x5c, buf)
-	#if (buf[0] + buf[1] + buf[2] + buf[3]) & 0xff != buf[4]:
-	#	raise Exception("checksum error")
+	data_humidity_high = int.from_bytes(i2c.readfrom_mem(0x5c, 0x00, 1), "")
+	data_humidity_low = int.from_bytes(i2c.readfrom_mem(0x5c, 0x01, 1), "")
 
-	# first two byte are humidity, next two byte are temperature
-	return (buf[0] + buf[1]) * 0.1
+	return (int(data_humidity_high) + int(data_humidity_low) * 0.1)
 
 def showDisplay(humidity):
 	lcd.clear()
@@ -143,9 +139,10 @@ while True:
 	sendMQTT(humidity)
 
 	if (ventilationCounter < VENTILATION_RATE):
-		ventilationCounter += 1
+		ventilationCounter = ventilationCounter + 1
 	else:
 		# ventilate and reset
+		ventilationNeeded = True
 		onOut1()
 		onOut2()
 		ventilationCounter = 0
