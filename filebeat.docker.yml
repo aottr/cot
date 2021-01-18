@@ -1,0 +1,11 @@
+filebeat.inputs:
+- type: mqtt
+  hosts: 
+    - mqtt://mqtt.dit.htwk-leipzig.de:1883
+  username: lab
+  password: fdit
+  topics: 
+    - lab/03*
+
+output.console:
+  pretty: true
