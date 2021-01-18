@@ -56,7 +56,7 @@ def readHumidity():
 	data_humidity_high = int.from_bytes(i2c.readfrom_mem(0x5c, 0x00, 1), "")
 	data_humidity_low = int.from_bytes(i2c.readfrom_mem(0x5c, 0x01, 1), "")
 
-	return (int(data_humidity_high) + int(data_humidity_low) * 0.1)
+	return data_humidity_high + (data_humidity_low * 0.1)
 
 def showDisplay(humidity):
 	lcd.clear()
