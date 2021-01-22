@@ -138,13 +138,13 @@ def sendMQTT(humidity):
 	message = str('{{"timestamp":"{}","humidity":{},"ventilationNeeded":{},"stateOut1":{},"stateOut2":{}}}'.format(timestamp, str(humidity), str(ventilationNeeded).lower(), str(stateOut1).lower(), str(stateOut2).lower()))
 	mqtt.publish(topic, message)
 
-  #topic = str('lab/03/room-2')
-  #message = str('{{"humidity":{},"ventilationNeeded":{},"stateOut1":{},"stateOut2":{}}}'.format(str(humidity-3), str(ventilationNeeded).lower(), str(stateOut1).lower(), str(stateOut2).lower()))
-  #mqtt.publish(topic, message)
+	#topic = str('lab/03/room-2')
+	#message = str('{{"humidity":{},"ventilationNeeded":{},"stateOut1":{},"stateOut2":{}}}'.format(str(humidity-3), str(ventilationNeeded).lower(), str(stateOut1).lower(), str(stateOut2).lower()))
+	#mqtt.publish(topic, message)
 
-  #topic = str('lab/03/room-3')
-  #message = str('{{"humidity":{},"ventilationNeeded":{},"stateOut1":{},"stateOut2":{}}}'.format(str(humidity+40), str(ventilationNeeded).lower(), str(stateOut1).lower(), str(stateOut2).lower()))
-  #mqtt.publish(topic, message)
+	#topic = str('lab/03/room-3')
+	#message = str('{{"humidity":{},"ventilationNeeded":{},"stateOut1":{},"stateOut2":{}}}'.format(str(humidity+40), str(ventilationNeeded).lower(), str(stateOut1).lower(), str(stateOut2).lower()))
+	#mqtt.publish(topic, message)
 
 def onOut1():
 	p12.on()
