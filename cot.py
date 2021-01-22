@@ -4,115 +4,97 @@ from uiflow import *
 from machine import Pin, I2C
 from m5mqtt import M5mqtt
 import time
-from machine import RTC
-rtc = RTC()
-
 import urequests
 import json
 
-def getWeekday(weekday):
-  if weekday == 'Monday':
-    return 1
-  elif weekday == 'Tuesday':
-    return 2
-  elif weekday == 'Wednesday':
-    return 3
-  elif weekday == 'Thursday':
-    return 4
-  elif weekday == 'Friday':
-    return 5
-  elif weekday == 'Saturday':
-    return 6
-  else:
-    return 7
+from machine import RTC
+rtc = RTC()
 
-def parseDateTimeStr(dts, weekday):
-  # 2021-01-22 T 14:30+01:00
-  parts = dts.split('T')
-  # date
-  datep = parts[0].split('-')
-  #time
-  timep0 = parts[1].split('+')
-  timep = timep0[0].split(':')
-  #rtc.init( (int(datep[0]), int(datep[1]), int(datep[2]), int(timep[0]), int(timep[1])) )
-  rtc.datetime(( int(datep[0]), int(datep[1]), int(datep[2]), getWeekday(weekday), int(timep[0]), int(timep[1]), 0, 0)) # set a specific date and time
 
-req = urequests.request(method='GET', url='http://worldclockapi.com/api/json/cet/now', headers={'Content-Type':'json/html'})
-#date_time_str = '2018-06-29 08:15:27.243860'
-date = json.loads(req.text)
-parseDateTimeStr(date["currentDateTime"], date["dayOfTheWeek"])
-#date_time_obj = datetime.datetime.strptime(date_time_str, '%Y-%m-%d %H:%M:%S.%f')
+# humidity reference value
+GOOD_HUMIDITY = 40.0
+# room id of device
+ROOM_ID = "room-1"
+# check interval in ms
+CHECK_INTERVAL = 3000
+# rate to trigger ventilation (e.g. 6 means that after 6*CHECK_INTERVAL with no ventilation, ventilation will be initiated anyway)
+VENTILATION_RATE = 6
 
-# 400kHz is already default
+
+# function to map weekday string to number and return it
+def mapWeekdayStr(weekdayStr):
+	if weekdayStr == 'Monday':
+		return 1
+	elif weekdayStr == 'Tuesday':
+		return 2
+	elif weekdayStr == 'Wednesday':
+		return 3
+	elif weekdayStr == 'Thursday':
+		return 4
+	elif weekdayStr == 'Friday':
+		return 5
+	elif weekdayStr == 'Saturday':
+		return 6
+	else:
+		return 7
+
+# function to parse datetime in format 2021-01-22T14:30+01:00 with weekday and return datetime tuple
+def parseDateTime(dateTimeStr, weekdayStr):
+	parts = dateTimeStr.split('T')
+	date = parts[0].split('-')
+	time = parts[1].split('+')
+	timeParts = time[0].split(':')
+	dateTimeTuple = (int(date[0]), int(date[1]), int(date[2]), mapWeekdayStr(weekdayStr), int(timeParts[0]), int(timeParts[1]), 0, 0)
+	return dateTimeTuple
+
+# function to set system datetime with result of clock api request
+def setDateTime():
+	req = urequests.request(method='GET', url='http://worldclockapi.com/api/json/cet/now', headers={'Content-Type':'json/html'})
+	res = json.loads(req.text)
+	dateTimeTuple = parseDateTime(res["currentDateTime"], res["dayOfTheWeek"])
+	rtc.datetime(dateTimeTuple)
+
+# function to add leading zeros to string with numbers to get certain length
+def zfl(s, width):
+	return '{:0>{w}}'.format(s, w=width)
+
+
+# initialize i2c bus for dht12
 i2c = I2C(0, scl=Pin(22), sda=Pin(21))
 
+# initialize output pins for relais
 p12 = Pin(12, Pin.OUT)
 p12.off()
 p13 = Pin(13, Pin.OUT)
 p13.off()
 
-#rtc = RTC()
+# set system datetime
+setDateTime()
 
-#connect to broker
+# connect to mqtt broker
 mqtt = M5mqtt('room-1', 'mqtt.dit.htwk-leipzig.de', 1883, 'lab', 'fdit', 300)
 mqtt.start()
 
-# load from json or equivalent later, testing purposes only
-roomSetups = {
-	"room-1": {
-		"humidity":0.0,
-		"stateOut1":False,
-		"stateOut2":False,
-		"ventilationNeeded":False
-	},
-	"room-2": {
-		"humidity":0.0,
-		"stateOut1":False,
-		"stateOut2":False,
-		"ventilationNeeded":False
-	}
-}
-
-
+# initialize display
 lcd.font(lcd.FONT_DejaVu24)
 lcd.setBrightness(10)
 
-#humidity reference value
-GOOD_HUMIDITY = 40.0
-ROOM_ID = "room-1"
-
-CHECK_INTERVAL = 3000
-# 30min ventilation check
-VENTILATION_RATE = 6
-ventilationCounter = 0
-
-
-#relais outputs
+# initialize states
 stateOut1 = False
 stateOut2 = False
 ventilationNeeded = False
 
-def zfl(s, width):
-  return '{:0>{w}}'.format(s, w=width)
+# initialize ventilation counter
+ventilationCounter = 0
 
+
+# function to read data from i2c dht12 and return humidity
 def readHumidity():
-  #hum_int = int.from_bytes(i2c.readfrom_mem(0x5c, 0x00, 1), 'big')
-  #wait_ms(100)
-  #hum_dec = int.from_bytes(i2c.readfrom_mem(0x5c, 0x01, 1), 'big')
+	buf = bytearray(5)
+	i2c.readfrom_mem_into(0x5c, 0, buf)
+	return buf[0] + buf[1] * 0.1
 
-	#return data_humidity_high + (data_humidity_low * 0.1)
-  #data = i2c.readfrom_mem(0x5c,0x00, 5)
-  #temp_int = int.from_bytes(data,'big') >> 16 & 0xff
-  #temp_dec = int.from_bytes(data,'big') >> 8 & 0xff
-  #hum_int = int.from_bytes(data,'big') >> 32 & 0xff
-  #hum_dec = int.from_bytes(data,'big') >> 24 & 0xff
-  #cs = int.from_bytes(data,'big') >> 0 & 0xff
-
-  #return hum_int + hum_dec*0.1
-  buf = bytearray(5)
-  i2c.readfrom_mem_into(0x5c, 0, buf)
-  return buf[0] + buf[1] * 0.1
-
+# function to show state on display
 def showDisplay(humidity):
 	lcd.clear()
 
@@ -124,7 +106,6 @@ def showDisplay(humidity):
 		lcd.rect(0, 0, 320, 60, colourGood, colourGood)
 	else:
 		lcd.rect(0, 0, 320, 60, colourBad, colourBad)
-
 	lcd.print('humidity: {}%'.format(humidity), 0, 13, 0xffffff)
 
 	if ventilationNeeded:
@@ -148,13 +129,14 @@ def showDisplay(humidity):
 		lcd.rect(0, 180, 320, 60, colourBad, colourBad)
 		lcd.print('output2 state: off', 0, 193, 0xffffff)
 
+# function to send state and timestamp to defined mqtt broker
 def sendMQTT(humidity):
-  topic = str('lab/03/{}'.format(ROOM_ID))
-  # (2021, 1, 22, 4, 15, 9, 32, 321231) to 2019-09-07T15:50:00
-  dt = rtc.datetime()
-  datetimestr = "{}-{}-{}T{}:{}:{}+01:00".format(str(dt[0]), zfl(str(dt[1]),2), zfl(str(dt[2]),2), zfl(str(dt[4]),2), zfl(str(dt[5]),2), zfl(str(dt[6]),2) )
-  message = str('{{"timestamp":"{}","humidity":{},"ventilationNeeded":{},"stateOut1":{},"stateOut2":{}}}'.format(datetimestr, str(humidity), str(ventilationNeeded).lower(), str(stateOut1).lower(), str(stateOut2).lower()))
-  mqtt.publish(topic, message)
+	topic = str('lab/03/{}'.format(ROOM_ID))
+	# (2021, 1, 22, 4, 15, 9, 32, 321231) to 2019-09-07T15:50:00
+	dateTime = rtc.datetime()
+	timestamp = "{}-{}-{}T{}:{}:{}+01:00".format(str(dateTime[0]), zfl(str(dateTime[1]),2), zfl(str(dateTime[2]),2), zfl(str(dateTime[4]),2), zfl(str(dateTime[5]),2), zfl(str(dateTime[6]),2))
+	message = str('{{"timestamp":"{}","humidity":{},"ventilationNeeded":{},"stateOut1":{},"stateOut2":{}}}'.format(timestamp, str(humidity), str(ventilationNeeded).lower(), str(stateOut1).lower(), str(stateOut2).lower()))
+	mqtt.publish(topic, message)
 
   #topic = str('lab/03/room-2')
   #message = str('{{"humidity":{},"ventilationNeeded":{},"stateOut1":{},"stateOut2":{}}}'.format(str(humidity-3), str(ventilationNeeded).lower(), str(stateOut1).lower(), str(stateOut2).lower()))
@@ -184,6 +166,7 @@ def offOut2():
 	global stateOut2
 	stateOut2 = False
 
+
 while True:
 	humidity = readHumidity()
 	# if bad humidity
@@ -193,7 +176,7 @@ while True:
 			onOut1()
 			onOut2()
 			# reset counter bc windows open
-			ventilationCounter = 0
+		ventilationCounter = 0
 	# very good -> turn off vents
 	elif (humidity > 55.0):
 		if (ventilationNeeded == True and stateOut1 == True and stateOut2 == True):
@@ -201,16 +184,25 @@ while True:
 			offOut1()
 			offOut2()
 	# either way, print value and send status
-	showDisplay(humidity)
-	sendMQTT(humidity)
 
-	if (ventilationCounter < VENTILATION_RATE):
+	if (ventilationCounter < VENTILATION_RATE-1):
 		ventilationCounter = ventilationCounter + 1
+		showDisplay(humidity)
+		sendMQTT(humidity)
 	else:
 		# ventilate and reset
 		ventilationNeeded = True
 		onOut1()
 		onOut2()
+		showDisplay(humidity)
+		sendMQTT(humidity)
+		wait_ms(CHECK_INTERVAL)
+		
+		ventilationNeeded = False
+		offOut1()
+		offOut2()
+		showDisplay(humidity)
+		sendMQTT(humidity)
 		ventilationCounter = 0
 
 	wait_ms(CHECK_INTERVAL)
