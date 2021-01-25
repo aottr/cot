@@ -1,0 +1,9 @@
+filebeat.inputs:
+- type: mqtt
+  hosts: 'mqtt://${MQTT_HOST}'
+  username: '${MQTT_USERNAME}'
+  password: '${MQTT_PASSWORD}'
+  topics: '${MQTT_TOPIC}'
+
+output.console:
+  pretty: true
