@@ -5,7 +5,6 @@ services:
     container_name: elasticsearch
     image: docker.elastic.co/elasticsearch/elasticsearch:7.10.2
     volumes:
-      - ./elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
       - elasticsearch_data:/usr/share/elasticsearch/data
     ports:
       - 127.0.0.1:9200:9200
@@ -20,7 +19,7 @@ services:
 
   filebeat:
     container_name: filebeat
-    image: docker.elastic.co/filebeat/filebeat:7.10.2
+    image: docker.elastic.co/beats/filebeat:7.10.2
     volumes:
       - ./filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
     networks:
