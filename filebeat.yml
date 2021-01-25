@@ -1,9 +1,16 @@
 filebeat.inputs:
 - type: mqtt
-  hosts: 'mqtt://${MQTT_HOST}'
+  hosts: 'tcp://${MQTT_HOST}'
   username: '${MQTT_USERNAME}'
   password: '${MQTT_PASSWORD}'
   topics: '${MQTT_TOPIC}'
+
+processors:
+  - decode_json_fields:
+      fields: ["message"]
+      target: "data"
+  - drop_fields:
+      fields: ["message"]
 
 output.console:
   pretty: true
