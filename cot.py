@@ -178,7 +178,7 @@ while True:
 			# reset counter bc windows open
 		ventilationCounter = 0
 	# very good -> turn off vents
-	elif (humidity > 55.0):
+	elif (humidity > 50.0):
 		if (ventilationNeeded == True and stateOut1 == True and stateOut2 == True):
 			ventilationNeeded = False
 			offOut1()
